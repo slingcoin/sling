@@ -1,0 +1,9 @@
+Building Sling
+
+See doc/readme-qt.rst for instructions on building Sling QT,
+the intended-for-end-users, nice-graphical-interface, reference
+implementation of Sling.
+
+See doc/build-*.txt for instructions on building slingd,
+the intended-for-services, no-graphical-interface, reference
+implementation of Sling.
