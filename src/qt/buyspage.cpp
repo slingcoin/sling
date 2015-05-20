@@ -220,7 +220,7 @@ void BuysPage::on_escrowLockButton_clicked()
         msg.setText("The seller's escrow transaction is invalid.");
         msg.exec();
         return;
-    {
+    }
     else
     {
         CEscrowRelease release;
