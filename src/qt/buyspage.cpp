@@ -207,7 +207,7 @@ void BuysPage::on_escrowLockButton_clicked()
 	{
 	    // found seller's buy accept
 	    CWalletTx wtxSeller;
-	    CDataStream ssTx(p.second.sellerEscrowLockTxHash.data(), p.second.sellerEscrowLockTxHash.data() + p.second.sellerEscrowLockTxHash.size(), SER_NETWORK, CLIENT_VERSION);
+	    CDataStream ssTx(p.second.raw.data(), p.second.raw.data() + p.second.raw.size(), SER_NETWORK, CLIENT_VERSION);
 	    ssTx >> wtxSeller;
 	    accepted = wtxSeller.AcceptToMemoryPool();
 	    break;

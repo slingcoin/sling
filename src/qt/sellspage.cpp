@@ -195,7 +195,7 @@ void SellsPage::on_acceptButton_clicked()
     	ssTx << wtxNew;
 
 	// misuse this parameter like a boss
-	accept.sellerEscrowLockTxHash = ssTx.str();
+	accept.raw = ssTx.str();
 
 	SignBuyAccept(accept, accept.vchSig);
 	ReceiveBuyAccept(accept);
