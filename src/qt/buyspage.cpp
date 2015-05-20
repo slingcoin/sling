@@ -203,7 +203,7 @@ void BuysPage::on_escrowLockButton_clicked()
     // deserialize the seller's escrow tx
     BOOST_FOREACH(PAIRTYPE(const uint256, CBuyAccept)& p, mapBuyAccepts)
     {
-	if(p.second.listingId == buyRequest.listingId && p.second.requestId == buyRequestId)
+	if(p.second.listingId == buyRequest.listingId && p.second.buyRequestId == buyRequestId)
 	{
 	    // found seller's buy accept
 	    CWalletTx wtxSeller;
