@@ -4,9 +4,9 @@ VERSION = 1.3.3.7
 INCLUDEPATH += src src/json src/qt src/qt/plugins/mrichtexteditor
 QT += network printsupport
 DEFINES += ENABLE_WALLET
-DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
+DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE USE_NATIVE_I2P
 CONFIG += no_include_pwd
-CONFIG += thread
+CONFIG += thread static
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
@@ -126,6 +126,14 @@ QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) cl
     PRE_TARGETDEPS += $$OUT_PWD/build/build.h
     QMAKE_EXTRA_TARGETS += genbuild
     DEFINES += HAVE_BUILD_INFO
+}
+
+contains(DEFINES, USE_NATIVE_I2P) {
+    geni2pbuild.depends = FORCE
+    geni2pbuild.commands = cd $$PWD; /bin/sh share/inc_build_number.sh src/i2pbuild.h bitcoin-qt-build-number
+    geni2pbuild.target = src/i2pbuild.h
+    PRE_TARGETDEPS += src/i2pbuild.h
+    QMAKE_EXTRA_TARGETS += geni2pbuild
 }
 
 contains(USE_O3, 1) {
@@ -268,7 +276,14 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/sendmessagesdialog.h \
     src/qt/sendmessagesentry.h \
     src/qt/plugins/mrichtexteditor/mrichtextedit.h \
-    src/qt/qvalidatedtextedit.h
+    src/qt/qvalidatedtextedit.h \
+    src/qt/slingroad.h \
+    src/qt/buyspage.h \
+    src/qt/sellspage.h \
+    src/qt/createmarketlistingdialog.h \
+    src/qt/marketlistingdetailsdialog.h \
+    src/qt/deliverydetailsdialog.h \
+    src/market.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
@@ -381,7 +396,14 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/sendmessagesentry.cpp \
     src/qt/qvalidatedtextedit.cpp \
     src/qt/plugins/mrichtexteditor/mrichtextedit.cpp \
-    src/rpcsmessage.cpp
+    src/rpcsmessage.cpp \
+    src/qt/slingroad.cpp \
+    src/qt/buyspage.cpp \
+    src/qt/sellspage.cpp \
+    src/qt/createmarketlistingdialog.cpp \
+    src/qt/marketlistingdetailsdialog.cpp \
+    src/qt/deliverydetailsdialog.cpp \
+    src/market.cpp
 
 
 RESOURCES += \
@@ -408,13 +430,35 @@ FORMS += \
     src/qt/forms/messagepage.ui \
     src/qt/forms/sendmessagesentry.ui \
     src/qt/forms/sendmessagesdialog.ui \
-    src/qt/plugins/mrichtexteditor/mrichtextedit.ui 
+    src/qt/plugins/mrichtexteditor/mrichtextedit.ui \
+    src/qt/forms/slingroad.ui \
+    src/qt/forms/buyspage.ui \
+    src/qt/forms/sellspage.ui \
+    src/qt/forms/createmarketlistingdialog.ui \
+    src/qt/forms/marketlistingdetailsdialog.ui \
+    src/qt/forms/deliverydetailsdialog.ui
 
 contains(USE_QRCODE, 1) {
 HEADERS += src/qt/qrcodedialog.h
 SOURCES += src/qt/qrcodedialog.cpp
 FORMS += src/qt/forms/qrcodedialog.ui
 }
+
+contains(DEFINES, USE_NATIVE_I2P) {
+HEADERS += src/i2p.h \
+	src/i2psam.h \
+	src/qt/showi2paddresses.h \
+	src/qt/i2poptionswidget.h
+
+SOURCES += src/i2p.cpp \
+	src/i2psam.cpp \
+	src/qt/showi2paddresses.cpp \
+	src/qt/i2poptionswidget.cpp
+
+FORMS += src/qt/forms/showi2paddresses.ui \
+	src/qt/forms/i2poptionswidget.ui
+}
+ 
 
 CODECFORTR = UTF-8
 

@@ -36,6 +36,13 @@
 #include "richlist.h"
 #include "messagemodel.h"
 #include "messagepage.h"
+#include "slingroad.h"
+#include "buyspage.h"
+#include "sellspage.h"
+
+#ifdef USE_NATIVE_I2P
+#include "showi2paddresses.h"
+#endif
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
@@ -136,6 +143,10 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
 
     richListPage = new RichListPage(this);
     messagePage = new MessagePage(this);
+
+    slingRoad = new SlingRoad(this);
+    buysPage = new BuysPage(this);
+    sellsPage = new SellsPage(this);
     
     centralStackedWidget = new QStackedWidget(this);
     centralStackedWidget->setContentsMargins(0, 0, 0, 0);
@@ -148,6 +159,9 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     centralStackedWidget->addWidget(masternodeManagerPage);
     centralStackedWidget->addWidget(richListPage);
     centralStackedWidget->addWidget(messagePage);
+    centralStackedWidget->addWidget(slingRoad);
+    centralStackedWidget->addWidget(buysPage);
+    centralStackedWidget->addWidget(sellsPage);
 
     QWidget *centralWidget = new QWidget();
     QVBoxLayout *centralLayout = new QVBoxLayout(centralWidget);
@@ -176,6 +190,16 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     labelStakingIcon = new QLabel();
     labelConnectionsIcon = new QLabel();
     labelBlocksIcon = new QLabel();
+
+#ifdef USE_NATIVE_I2P
+    labelI2PConnections = new QLabel();
+    labelI2POnly = new QLabel();
+    labelI2PGenerated = new QLabel();
+    frameBlocksLayout->addWidget(labelI2PGenerated);
+    frameBlocksLayout->addWidget(labelI2POnly);
+    frameBlocksLayout->addWidget(labelI2PConnections);
+#endif
+
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelEncryptionIcon);
     frameBlocksLayout->addStretch();
@@ -292,6 +316,21 @@ void BitcoinGUI::createActions()
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
     tabGroup->addAction(addressBookAction);
 
+    slingRoadAction = new QAction(QIcon(":/icons/bitcoin"), tr("S&ling Road"), this);
+    slingRoadAction->setToolTip(tr("Browse the Market."));
+    slingRoadAction->setCheckable(true);
+    tabGroup->addAction(slingRoadAction);
+
+    buysPageAction = new QAction(QIcon(":/icons/bitcoin"), tr("&Buys"), this);
+    buysPageAction->setToolTip(tr("Show my Sling Road Buys."));
+    buysPageAction->setCheckable(true);
+    tabGroup->addAction(buysPageAction);
+
+    sellsPageAction = new QAction(QIcon(":/icons/bitcoin"), tr("S&ells"), this);
+    sellsPageAction->setToolTip(tr("Show my Sling Road Sells."));
+    sellsPageAction->setCheckable(true);
+    tabGroup->addAction(sellsPageAction);
+
     masternodeManagerAction = new QAction(QIcon(":/icons/bitcoin"), tr("&SlingShot"), this);
     masternodeManagerAction->setToolTip(tr("Show SlingShot Nodes status and configure your nodes."));
     masternodeManagerAction->setCheckable(true);
@@ -323,6 +362,12 @@ void BitcoinGUI::createActions()
     connect(richListPageAction, SIGNAL(triggered()), this, SLOT(gotoRichListPage()));
     connect(messageAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(messageAction, SIGNAL(triggered()), this, SLOT(gotoMessagePage()));
+    connect(slingRoadAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(slingRoadAction, SIGNAL(triggered()), this, SLOT(gotoSlingRoad()));
+    connect(buysPageAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(buysPageAction, SIGNAL(triggered()), this, SLOT(gotoBuysPage()));
+    connect(sellsPageAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(sellsPageAction, SIGNAL(triggered()), this, SLOT(gotoSellsPage()));
 
     quitAction = new QAction(tr("E&xit"), this);
     quitAction->setToolTip(tr("Quit application"));
@@ -432,6 +477,9 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(sendCoinsAction);
     toolbar->addAction(historyAction);
     toolbar->addAction(addressBookAction);
+    toolbar->addAction(slingRoadAction);
+    toolbar->addAction(buysPageAction);
+    toolbar->addAction(sellsPageAction);
     toolbar->addAction(masternodeManagerAction);
     toolbar->addAction(richListPageAction);
     toolbar->addAction(messageAction);
@@ -445,7 +493,34 @@ void BitcoinGUI::createToolBars()
 void BitcoinGUI::setClientModel(ClientModel *clientModel)
 {
     if(!fOnlyTor)
+    {
+#ifdef USE_NATIVE_I2P
+             setNumI2PConnections(clientModel->getNumI2PConnections());
+             connect(clientModel, SIGNAL(numI2PConnectionsChanged(int)), this, SLOT(setNumI2PConnections(int)));
+	if(clientModel->isI2POnly())
+	{
+	     netLabel->setText("I2P");
+             netLabel->setToolTip(tr("Wallet is using I2P-network only"));
+	}
+	else
+	{
+	#endif
 	netLabel->setText("CLEARNET");
+#ifdef USE_NATIVE_I2P
+	}
+
+        if (clientModel->isI2PAddressGenerated())
+        {
+            labelI2PGenerated->setText("DYN");
+            labelI2PGenerated->setToolTip(tr("Wallet is running with a random generated I2P-address"));
+        }
+        else
+        {
+            labelI2PGenerated->setText("STA");
+            labelI2PGenerated->setToolTip(tr("Wallet is running with a static I2P-address"));
+        }
+	#endif
+    }
     else
     {
 	if(!IsLimited(NET_TOR))
@@ -596,6 +671,9 @@ void BitcoinGUI::optionsClicked()
         return;
     OptionsDialog dlg;
     dlg.setModel(clientModel->getOptionsModel());
+#ifdef USE_NATIVE_I2P
+    dlg.setClientModel(clientModel);
+#endif
     dlg.exec();
 }
 
@@ -605,6 +683,31 @@ void BitcoinGUI::aboutClicked()
     dlg.setModel(clientModel);
     dlg.exec();
 }
+
+#ifdef USE_NATIVE_I2P
+void BitcoinGUI::showGeneratedI2PAddr(const QString& caption, const QString& pub, const QString& priv, const QString& b32, const QString& configFileName)
+{
+    ShowI2PAddresses i2pDialog(caption, pub, priv, b32, configFileName, this);
+    i2pDialog.exec();
+}
+#endif
+
+#ifdef USE_NATIVE_I2P
+void BitcoinGUI::setNumI2PConnections(int count)
+{
+    QString i2pIcon;
+    switch(count)
+    {
+    case 0: i2pIcon = ":/icons/bwi2pconnect_0"; break;
+    case 1: /*case 2: case 3:*/ i2pIcon = ":/icons/bwi2pconnect_1"; break;
+    case 2:/*case 4: case 5: case 6:*/ i2pIcon = ":/icons/bwi2pconnect_2"; break;
+    case 3:/*case 7: case 8: case 9:*/ i2pIcon = ":/icons/bwi2pconnect_3"; break;
+    default: i2pIcon = ":/icons/bwi2pconnect_4"; break;
+    }
+    labelI2PConnections->setPixmap(QPixmap(i2pIcon));
+    labelI2PConnections->setToolTip(tr("%n active connection(s) to I2P-Sling network", "", count));
+}
+#endif
 
 void BitcoinGUI::setNumConnections(int count)
 {
@@ -877,6 +980,33 @@ void BitcoinGUI::gotoMasternodeManagerPage()
     //masternodeManagerPage = new MasternodeManager(this);
     //centralStackedWidget->addWidget(masternodeManagerPage);
     centralStackedWidget->setCurrentWidget(masternodeManagerPage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoSlingRoad()
+{
+    slingRoadAction->setChecked(true);
+    centralStackedWidget->setCurrentWidget(slingRoad);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoBuysPage()
+{
+    buysPageAction->setChecked(true);
+    centralStackedWidget->setCurrentWidget(buysPage);
+
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
+
+void BitcoinGUI::gotoSellsPage()
+{
+    sellsPageAction->setChecked(true);
+    centralStackedWidget->setCurrentWidget(sellsPage);
 
     exportAction->setEnabled(false);
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);

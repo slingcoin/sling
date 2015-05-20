@@ -45,6 +45,11 @@
         <file alias="staking_on">res/icons/staking_on.png</file>
         <file alias="onion">res/icons/onion.png</file>
         <file alias="onionblack">res/icons/onion-black.png</file>
+	<file alias="bwi2pconnect_0">res/icons/i2plogo_wbw_0_16.png</file>
+        <file alias="bwi2pconnect_1">res/icons/i2plogo_wbw_1_16.png</file>
+        <file alias="bwi2pconnect_2">res/icons/i2plogo_wbw_2_16.png</file>
+        <file alias="bwi2pconnect_3">res/icons/i2plogo_wbw_3_16.png</file>
+        <file alias="bwi2pconnect_4">res/icons/i2plogo_wbw_4_16.png</file>
     </qresource>
     <qresource prefix="/icons/black">
         <file alias="connect_0">res/icons/black/connect0_16.png</file>
@@ -66,6 +71,7 @@
         <file alias="about">res/images/about.png</file>
         <file alias="splash">res/images/splash3.png</file>
         <file alias="header">res/images/header.png</file>
+        <file alias="slingroad">res/images/slingroadheader.png</file>
     </qresource>
     <qresource prefix="/movies">
         <file alias="update_spinner">res/movies/update_spinner.mng</file>

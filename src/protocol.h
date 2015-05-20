@@ -60,6 +60,10 @@ class CMessageHeader
 enum
 {
     NODE_NETWORK = (1 << 0),
+    NODE_MARKET = (1 << 1),
+#ifdef USE_NATIVE_I2P
+    NODE_I2P     = (1 << 7),
+#endif
 };
 
 /** A CService with information about it as peer */

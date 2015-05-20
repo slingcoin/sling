@@ -22,6 +22,7 @@
 #include "masternode.h"
 #include "spork.h"
 #include "smessage.h"
+#include "market.h"
 
 using namespace std;
 using namespace boost;
@@ -1701,7 +1702,7 @@ void CBlock::RebuildAddressIndex(CTxDB& txdb)
     }
 }
 
-static int64_t nTimeConnect = 0;
+
 bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 {
     // Check it again in case a previous version let a bad block in, but skip BlockSig checking
@@ -3927,6 +3928,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
     else
     {
+	MarketProcessMessage(pfrom, strCommand, vRecv);
+
         if (fSecMsgEnabled)
             SecureMsgReceiveData(pfrom, strCommand, vRecv);
 

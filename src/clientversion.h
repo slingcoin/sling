@@ -8,8 +8,13 @@
 // These need to be macros, as version.cpp's and bitcoin-qt.rc's voodoo requires it
 #define CLIENT_VERSION_MAJOR       1
 #define CLIENT_VERSION_MINOR       3
-#define CLIENT_VERSION_REVISION    5
+#define CLIENT_VERSION_REVISION    7
 #define CLIENT_VERSION_BUILD       7
+
+#ifdef USE_NATIVE_I2P 
+#define I2P_NATIVE_VERSION_MAJOR       0
+#define I2P_NATIVE_VERSION_MINOR       2
+#endif
 
 // Set to true for release, false for prerelease or test build
 #define CLIENT_VERSION_IS_RELEASE  true

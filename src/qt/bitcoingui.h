@@ -20,6 +20,9 @@ class MasternodeManager;
 class RichListPage;
 class MessagePage;
 class MessageModel;
+class SlingRoad;
+class BuysPage;
+class SellsPage;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -78,6 +81,9 @@ private:
     MasternodeManager *masternodeManagerPage;
     RichListPage *richListPage;
     MessagePage *messagePage;
+    SlingRoad *slingRoad;
+    BuysPage *buysPage;
+    SellsPage *sellsPage;
 
     QLabel* netLabel;
     QLabel *labelEncryptionIcon;
@@ -86,6 +92,11 @@ private:
     QLabel *labelBlocksIcon;
     QLabel *progressBarLabel;
     QProgressBar *progressBar;
+#ifdef USE_NATIVE_I2P
+    QLabel* labelI2PConnections;
+    QLabel* labelI2POnly;
+    QLabel* labelI2PGenerated;
+#endif
 
     QMenuBar *appMenuBar;
     QAction *overviewAction;
@@ -110,6 +121,9 @@ private:
     QAction *masternodeManagerAction;
     QAction *richListPageAction;
     QAction *messageAction;
+    QAction *slingRoadAction;
+    QAction *buysPageAction;
+    QAction *sellsPageAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -134,6 +148,9 @@ private:
     void clearWidgets();
 
 public slots:
+#ifdef USE_NATIVE_I2P
+    void setNumI2PConnections(int count);
+#endif
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
     /** Set number of blocks shown in the UI */
@@ -162,6 +179,9 @@ public slots:
     */
     void askFee(qint64 nFeeRequired, bool *payFee);
     void handleURI(QString strURI);
+#ifdef USE_NATIVE_I2P
+    void showGeneratedI2PAddr(const QString& caption, const QString& pub, const QString& priv, const QString& b32, const QString& configFileName);
+#endif 
 
 private slots:
     /** Switch to overview (home) page */
@@ -176,6 +196,10 @@ private slots:
     void gotoSendCoinsPage();
 
     void gotoMasternodeManagerPage();
+
+    void gotoSlingRoad();
+    void gotoBuysPage();
+    void gotoSellsPage();
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
