@@ -11,6 +11,7 @@
 #include <QClipboard>
 #include <QMessageBox>
 
+
 SlingRoad::SlingRoad(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SlingRoad)
@@ -24,6 +25,7 @@ SlingRoad::SlingRoad(QWidget *parent) :
     ui->buyButton->setEnabled(false);
     ui->viewDetailsButton->setEnabled(false);
     ui->copyAddressButton->setEnabled(false);
+    lastPrice = 0;
 }
 
 SlingRoad::~SlingRoad()
@@ -62,14 +64,16 @@ void SlingRoad::on_categoriesListWidget_currentItemChanged(QListWidgetItem* curr
 	QTableWidgetItem* untilItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat(p.listing.nCreated + (7 * 24 * 60 * 60))));
         QTableWidgetItem* vendorItem = new QTableWidgetItem(QString::fromStdString(CBitcoinAddress(p.listing.sellerKey.GetID()).ToString()));
         QTableWidgetItem* priceItem = new QTableWidgetItem(QString::number(p.listing.nPrice / COIN, 'f', 8));
+	QTableWidgetItem* btcPriceItem = new QTableWidgetItem(QString::number( (p.listing.nPrice/COIN) * lastPrice, 'f', 8));
         QTableWidgetItem* titleItem = new QTableWidgetItem(QString::fromStdString(p.listing.sTitle));
 	QTableWidgetItem* idItem = new QTableWidgetItem(QString::fromStdString(p.GetHash().ToString()));
         ui->tableWidget->insertRow(0);
         ui->tableWidget->setItem(0, 0, untilItem);
         ui->tableWidget->setItem(0, 1, vendorItem);
         ui->tableWidget->setItem(0, 2, priceItem);
-        ui->tableWidget->setItem(0, 3, titleItem);
-        ui->tableWidget->setItem(0, 4, idItem);
+	ui->tableWidget->setItem(0, 3, btcPriceItem);
+        ui->tableWidget->setItem(0, 4, titleItem);
+        ui->tableWidget->setItem(0, 5, idItem);
     }
 }
 

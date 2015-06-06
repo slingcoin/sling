@@ -117,6 +117,8 @@ public:
     boost::signals2::signal<void ()> NotifyBuyRejected;
     boost::signals2::signal<void ()> NotifyPaymentRequest;
 
+    boost::signals2::signal<void ()> NotifyLastPriceUpdated;
+
 #ifdef USE_NATIVE_I2P
    boost::signals2::signal<void (const std::string& caption, const std::string& pub, const std::string& priv, const std::string& b32, const std::string& configFileName)> ThreadSafeShowGeneratedI2PAddress;
 

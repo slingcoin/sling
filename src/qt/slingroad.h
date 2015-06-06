@@ -9,6 +9,8 @@ namespace Ui {
     class SlingRoad;
 }
 
+
+
 class SlingRoad : public QWidget
 {
     Q_OBJECT
@@ -19,13 +21,13 @@ public:
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
     void updateCategories();
+    double lastPrice;
 
 public slots:
     void updateCategory(QString category);
 
 private:
     Ui::SlingRoad *ui;
-    
 
 private slots:
     void on_tableWidget_itemSelectionChanged();

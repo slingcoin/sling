@@ -72,6 +72,13 @@
 #include <QScrollArea>
 #include <QScroller>
 #include <QTextDocument>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QtScript/QScriptEngine>
+#include <QtScript/QScriptValue>
+#include <QtScript/QScriptValueIterator>
+#include <QTimer>
 
 #include <iostream>
 
@@ -191,6 +198,11 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     labelConnectionsIcon = new QLabel();
     labelBlocksIcon = new QLabel();
 
+    labelPrice = new QLabel();
+    labelPrice->setObjectName("labelPrice");
+    labelPrice->setStyleSheet("#labelPrice { color: #ffffff; }");
+    labelPrice->setText("Bittrex: 0.00000000 BTC/SLING");
+
 #ifdef USE_NATIVE_I2P
     labelI2PConnections = new QLabel();
     labelI2POnly = new QLabel();
@@ -245,6 +257,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
         }
     }
 
+    statusBar()->addWidget(labelPrice);
     statusBar()->addWidget(progressBarLabel);
     statusBar()->addWidget(progressBar);
     statusBar()->addPermanentWidget(frameBlocks);
@@ -271,6 +284,12 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     connect(receiveCoinsPage, SIGNAL(signMessage(QString)), this, SLOT(gotoSignMessageTab(QString)));
 
     gotoOverviewPage();
+
+    networkManager = new QNetworkAccessManager(this);
+    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(updateTimer_timeout()));
+    updateTimer.setInterval(1800000); // every half hour
+    updateTimer.start();
+    updateTimer_timeout();
 }
 
 BitcoinGUI::~BitcoinGUI()
@@ -280,6 +299,57 @@ BitcoinGUI::~BitcoinGUI()
 #ifdef Q_OS_MAC
     delete appMenuBar;
 #endif
+}
+
+void BitcoinGUI::updateTimer_timeout()
+{
+    QUrl url("https://bittrex.com/api/v1.1/public/getmarketsummary?market=btc-sling");
+    QNetworkRequest request;
+    request.setUrl(url);
+    QNetworkReply* currentReply = networkManager->get(request);
+    connect(currentReply, SIGNAL(finished()), this, SLOT(bittrexReplyFinished()));
+}
+
+void BitcoinGUI::bittrexReplyFinished()
+{ 
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (reply->error() !=0)
+    {
+        if (reply->error() == 1 )
+        {
+            // connection refused
+            return;
+        }
+    else
+    {
+        LogPrintf(reply->errorString().toStdString().c_str());
+        
+        return;
+    }
+    }
+
+    QString data = (QString) reply->readAll();
+    QScriptEngine engine;
+    QScriptValue result = engine.evaluate("value = " + data);
+    
+    // Now parse this JSON according to your needs !
+    QScriptValue resultEntry = result.property("result");
+    QScriptValueIterator it(resultEntry);
+
+    while(it.hasNext())
+    {
+        it.next();
+        QScriptValue entry = it.value();
+
+        qsreal last = entry.property("Last").toNumber(); 
+        if(last > 0)
+        {
+	    lastPrice = last;
+	    slingRoad->lastPrice = last;
+	    labelPrice->setText("Bittrex: " + QString::number(last, 'f', 8) + " BTC/SLING");
+        }
+	uiInterface.NotifyLastPriceUpdated();
+    }
 }
 
 void BitcoinGUI::createActions()

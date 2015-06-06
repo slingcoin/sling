@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
+#include <QTimer>
 
 #include <stdint.h>
 
@@ -30,7 +31,10 @@ class QModelIndex;
 class QProgressBar;
 class QStackedWidget;
 class QScrollArea;
+class QTimer;
+class QNetworkAccessManager;
 QT_END_NAMESPACE
+
 
 /**
   Bitcoin GUI main class. This class represents the main window of the Bitcoin UI. It communicates with both the client and
@@ -54,6 +58,7 @@ public:
     */
     void setWalletModel(WalletModel *walletModel);
     void setMessageModel(MessageModel *messageModel);
+    double lastPrice;
 
 protected:
     void changeEvent(QEvent *e);
@@ -62,6 +67,8 @@ protected:
     void dropEvent(QDropEvent *event);
 
 private:
+    QNetworkAccessManager *networkManager;
+    QTimer updateTimer;
     ClientModel *clientModel;
     WalletModel *walletModel;
     MessageModel *messageModel;
@@ -85,6 +92,7 @@ private:
     BuysPage *buysPage;
     SellsPage *sellsPage;
 
+    QLabel* labelPrice;
     QLabel* netLabel;
     QLabel *labelEncryptionIcon;
     QLabel *labelStakingIcon;
@@ -184,6 +192,8 @@ public slots:
 #endif 
 
 private slots:
+    virtual void updateTimer_timeout();
+    void bittrexReplyFinished();
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
