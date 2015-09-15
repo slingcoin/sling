@@ -207,4 +207,9 @@ extern json_spirit::Value smsgsendanon(const json_spirit::Array& params, bool fH
 extern json_spirit::Value smsginbox(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value smsgoutbox(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value smsgbuckets(const json_spirit::Array& params, bool fHelp);
+
+extern json_spirit::Value marketalllistings(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketsearchlistings(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketbuy(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketsell(const json_spirit::Array& params, bool fHelp);
 #endif
