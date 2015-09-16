@@ -313,7 +313,6 @@ Value marketsell(const Array& params, bool fHelp)
 
 Value marketbuyrequests(const Array& params, bool fHelp)
 {
-    //BUG: tinyformat: Not enough conversion specifiers in format string (code -1)
     if (fHelp || params.size() != 0)
         throw runtime_error("marketbuyrequests \n"
                             "Returns your market buy requests \n"
@@ -328,7 +327,7 @@ Value marketbuyrequests(const Array& params, bool fHelp)
         CBuyRequest buyRequest = p.second;
         if(mapListings.find(buyRequest.listingId) != mapListings.end())
             {
-            CMarketListing item = mapListings[p.first].listing;
+            CMarketListing item = mapListings[buyRequest.listingId].listing;
             CTxDestination dest = mapListings[buyRequest.listingId].listing.sellerKey.GetID();
             if(IsMine(*pwalletMain, dest))
                 {
@@ -338,40 +337,41 @@ Value marketbuyrequests(const Array& params, bool fHelp)
                     switch(item.nStatus)
                     {
                         case LISTED:
-                        statusText = "Listed";
-                        break;
+                            statusText = "Listed";
+                            break;
                         case BUY_REQUESTED:
-                        statusText = "Buy Requested";
-                        break;
+                            statusText = "Buy Requested";
+                            break;
                         case BUY_ACCEPTED:
-                        statusText = "Accepted";
-                        break;
+                            statusText = "Accepted";
+                            break;
                         case BUY_REJECTED:
-                        statusText = "Rejected";
-                        break;
+                            statusText = "Rejected";
+                            break;
                         case ESCROW_LOCK:
-                        statusText = "Escrow Locked";
-                        break;
+                            statusText = "Escrow Locked";
+                            break;
                         case DELIVERY_DETAILS:
-                        statusText = "Delivery Details";
-                        break;
+                            statusText = "Delivery Details";
+                            break;
                         case ESCROW_PAID:
-                        statusText = "Escrow Paid";
-                        break;
+                            statusText = "Escrow Paid";
+                            break;
                         case REFUND_REQUESTED:
-                        statusText = "Refund Requested";
-                        break;
+                            statusText = "Refund Requested";
+                            break;
                         case REFUNDED:
-                        statusText = "Refunded";
-                        break;
+                            statusText = "Refunded";
+                            break;
                         case PAYMENT_REQUESTED:
-                        statusText = "Payment Requested";
-                        break;
+                            statusText = "Payment Requested";
+                            break;
                         default:
-                        statusText = "UNKNOWN";
+                            statusText = "UNKNOWN";
                         break;
                     }
 
+                    obj.push_back(Pair("requestId", buyRequest.GetHash().ToString()));
                     obj.push_back(Pair("buyerId", buyRequest.buyerKey.GetID().ToString()));
                     obj.push_back(Pair("title", item.sTitle));
                     obj.push_back(Pair("category", item.sCategory));
@@ -383,7 +383,6 @@ Value marketbuyrequests(const Array& params, bool fHelp)
                     obj.push_back(Pair("urlImage2", item.sImageTwoUrl));
                     obj.push_back(Pair("description", item.sDescription));
                     obj.push_back(Pair("creationDate", DateTimeStrFormat(item.nCreated)));
-                    obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.nCreated + (LISTING_DEFAULT_DURATION))));
                     obj.push_back(Pair("buyRequestDate", DateTimeStrFormat(buyRequest.nDate)));
 
                     ret.push_back(obj);
@@ -407,51 +406,52 @@ Value marketmybuys(const Array& params, bool fHelp)
 
     BOOST_FOREACH(PAIRTYPE(const uint256, CBuyRequest)& p, mapBuyRequests)
     {
-
-        CTxDestination dest = p.second.buyerKey.GetID();
+        CBuyRequest buyRequest = p.second;
+        CTxDestination dest = buyRequest.buyerKey.GetID();
         if(IsMine(*pwalletMain, dest))
         {
             std::string statusText = "UNKNOWN";
             switch(p.second.nStatus)
             {
                 case LISTED:
-                statusText = "Listed";
-                break;
+                    statusText = "Listed";
+                    break;
                 case BUY_REQUESTED:
-                statusText = "Buy Requested";
-                break;
+                    statusText = "Buy Requested";
+                    break;
                 case BUY_ACCEPTED:
-                statusText = "Accepted";
-                break;
+                    statusText = "Accepted";
+                    break;
                 case BUY_REJECTED:
-                statusText = "Rejected";
-                break;
+                    statusText = "Rejected";
+                    break;
                 case ESCROW_LOCK:
-                statusText = "Escrow Locked";
-                break;
+                    statusText = "Escrow Locked";
+                    break;
                 case DELIVERY_DETAILS:
-                statusText = "Delivery Details";
-                break;
+                    statusText = "Delivery Details";
+                    break;
                 case ESCROW_PAID:
-                statusText = "Escrow Paid";
-                break;
+                    statusText = "Escrow Paid";
+                    break;
                 case REFUND_REQUESTED:
-                statusText = "Refund Requested";
-                break;
+                    statusText = "Refund Requested";
+                    break;
                 case REFUNDED:
-                statusText = "Refunded";
-                break;
+                    statusText = "Refunded";
+                    break;
                 case PAYMENT_REQUESTED:
-                statusText = "Payment Requested";
-                break;
+                    statusText = "Payment Requested";
+                    break;
                 default:
-                statusText = "UNKNOWN";
-                break;
+                    statusText = "UNKNOWN";
+                    break;
             }
 
             Object obj;
-            CMarketListing item = mapListings[p.first].listing;
+            CMarketListing item = mapListings[buyRequest.listingId].listing;
 
+            obj.push_back(Pair("requestId", buyRequest.GetHash().ToString()));
             obj.push_back(Pair("title", item.sTitle));
             obj.push_back(Pair("category", item.sCategory));
             obj.push_back(Pair("itemId", item.GetHash().ToString()));
@@ -462,8 +462,7 @@ Value marketmybuys(const Array& params, bool fHelp)
             obj.push_back(Pair("urlImage2", item.sImageTwoUrl));
             obj.push_back(Pair("description", item.sDescription));
             obj.push_back(Pair("creationDate", DateTimeStrFormat(item.nCreated)));
-            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.nCreated + (LISTING_DEFAULT_DURATION))));
-            //TODO: needs date bought..
+            obj.push_back(Pair("buyRequestDate", DateTimeStrFormat(buyRequest.nDate)));
             ret.push_back(obj);
         }
     }
@@ -497,13 +496,12 @@ Value marketcancelescrow(const Array& params, bool fHelp)
     if (fHelp || params.size() == 0)
         throw runtime_error("marketcancelescrow \n"
                             "Cancels a market escrow \n"
-                            "parameters: <itemId> <requestId>");
+                            "parameters: <requestId>");
 
-    string itemID = params[0].get_str();
-    string requestID = params[1].get_str();
+    string requestID = params[0].get_str();
 
-    uint256 listingHashId = uint256(itemID);
     uint256 requestHashId = uint256(requestID);
+    uint256 listingHashId = mapBuyRequests[requestHashId].listingId;
 
     CBuyReject reject;
     reject.listingId = listingHashId;
@@ -522,13 +520,12 @@ Value marketrequestpayment(const Array& params, bool fHelp)
     if (fHelp || params.size() == 0)
         throw runtime_error("marketrequestpayment ListingID \n"
                             "Request a payment for a market item \n"
-                            "parameters: <itemId> <requestId>");
+                            "parameters: <requestId>");
 
-    string itemID = params[0].get_str();
-    string requestID = params[1].get_str();
+    string requestID = params[0].get_str();
 
-    uint256 listingHashId = uint256(itemID);
     uint256 requestHashId = uint256(requestID);
+    uint256 listingHashId = mapBuyRequests[requestHashId].listingId;
 
     CPaymentRequest request;
     request.listingId = listingHashId;
@@ -554,7 +551,7 @@ Value marketrefund(const Array& params, bool fHelp)
         throw runtime_error("marketrefund \n"
                             "Issues a refund for a market listing \n"
                             "parameters: <requestId>");
-
+    //TODO: SegFault:
     string requestID = params[0].get_str();
     uint256 requestHashId = uint256(requestID);
 
@@ -577,8 +574,8 @@ Value marketescrowlock(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 0)
         throw runtime_error("marketescrowlock \n"
-                            "Returns your market buy requests \n"\
-                             "parameters: <requestId>");
+                            "Locks esrow for a buy request \n"\
+                            "parameters: <requestId>");
 
     string requestID = params[0].get_str();
     uint256 requestHashId = uint256(requestID);
