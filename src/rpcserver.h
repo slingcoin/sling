@@ -220,5 +220,8 @@ extern json_spirit::Value marketcancellisting(const json_spirit::Array& params, 
 extern json_spirit::Value marketcancelescrow(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value marketrequestpayment(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value marketrefund(const json_spirit::Array& params, bool fHelp);
-
+extern json_spirit::Value marketmybuys(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketescrowlock(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketreleaseescrow(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketrequestrefund(const json_spirit::Array& params, bool fHelp);
 #endif

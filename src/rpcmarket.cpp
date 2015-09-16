@@ -49,21 +49,21 @@ Value marketalllistings(const Array& params, bool fHelp)
         if(bFound)
             continue; // go to next item, this one someone is already buying
 
-        Object obj;
-        std::string titleItem = item.listing.sTitle;
-
-        if (titleItem != "")
+        if (item.listing.sTitle != "")
         {
-            std::string vendorItemId = CBitcoinAddress(item.listing.sellerKey.GetID()).ToString();
-            std::string priceItem = QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString();
-            std::string idItem = item.GetHash().ToString();
-            std::string expireItem = DateTimeStrFormat(item.listing.nCreated + (7 * 24 * 60 * 60));
+            Object obj;
 
-            obj.push_back(Pair("vendorItemId", vendorItemId));
-            obj.push_back(Pair("priceItem", priceItem));
-            obj.push_back(Pair("titleItem", titleItem));
-            obj.push_back(Pair("idItem", idItem));
-            obj.push_back(Pair("expireItem", expireItem));
+            obj.push_back(Pair("title", item.listing.sTitle));
+            obj.push_back(Pair("category", item.listing.sCategory));
+            obj.push_back(Pair("id", item.GetHash().ToString()));
+            obj.push_back(Pair("vendorId", CBitcoinAddress(item.listing.sellerKey.GetID()).ToString()));
+            obj.push_back(Pair("price", QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString()));
+            obj.push_back(Pair("status", item.listing.nStatus));
+            obj.push_back(Pair("urlImage1", item.listing.sImageOneUrl));
+            obj.push_back(Pair("urlImage2", item.listing.sImageTwoUrl));
+            obj.push_back(Pair("description", item.listing.sDescription));
+            obj.push_back(Pair("creationDate", DateTimeStrFormat(item.listing.nCreated)));
+            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.listing.nCreated + (7 * 24 * 60 * 60))));
 
             ret.push_back(obj);
         }
@@ -116,16 +116,19 @@ Value marketsearchlistings(const Array& params, bool fHelp)
         if (foundSearch != -1 && titleItem != "")
         {
             Object obj;
-            std::string vendorItemId = CBitcoinAddress(item.listing.sellerKey.GetID()).ToString();
-            std::string priceItem = QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString();
-            std::string idItem = item.GetHash().ToString();
-            std::string expireItem = DateTimeStrFormat(item.listing.nCreated + (7 * 24 * 60 * 60));
 
-            obj.push_back(Pair("vendorItemId", vendorItemId));
-            obj.push_back(Pair("priceItem", priceItem));
-            obj.push_back(Pair("titleItem", titleItem));
-            obj.push_back(Pair("idItem", idItem));
-            obj.push_back(Pair("expireItem", expireItem));
+            obj.push_back(Pair("title", item.listing.sTitle));
+            obj.push_back(Pair("category", item.listing.sCategory));
+            obj.push_back(Pair("id", item.GetHash().ToString()));
+            obj.push_back(Pair("vendorId", CBitcoinAddress(item.listing.sellerKey.GetID()).ToString()));
+            obj.push_back(Pair("price", QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString()));
+            obj.push_back(Pair("status", item.listing.nStatus));
+            obj.push_back(Pair("urlImage1", item.listing.sImageOneUrl));
+            obj.push_back(Pair("urlImage2", item.listing.sImageTwoUrl));
+            obj.push_back(Pair("description", item.listing.sDescription));
+            obj.push_back(Pair("creationDate", DateTimeStrFormat(item.listing.nCreated)));
+            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.listing.nCreated + (7 * 24 * 60 * 60))));
+
 
             ret.push_back(obj);
         }
@@ -233,22 +236,142 @@ Value marketrejectbuy(const Array& params, bool fHelp)
 }
 
 //parameters: none
+//example: marketmylistings
+Value marketmylistings(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error("marketmylistings \n."
+                            "Returns your market listings.");
+
+    Array ret;
+
+    LOCK(cs_markets);
+
+    BOOST_FOREACH(PAIRTYPE(const uint256, CSignedMarketListing)& p, mapListings)
+    {
+
+        CTxDestination dest = p.second.listing.sellerKey.GetID();
+
+        if(IsMine(*pwalletMain, dest))
+        {
+
+            CSignedMarketListing item = p.second;
+            Object obj;
+
+            obj.push_back(Pair("title", item.listing.sTitle));
+            obj.push_back(Pair("category", item.listing.sCategory));
+            obj.push_back(Pair("id", item.GetHash().ToString()));
+            obj.push_back(Pair("vendorId", CBitcoinAddress(item.listing.sellerKey.GetID()).ToString()));
+            obj.push_back(Pair("price", QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString()));
+            obj.push_back(Pair("status", item.listing.nStatus));
+            obj.push_back(Pair("urlImage1", item.listing.sImageOneUrl));
+            obj.push_back(Pair("urlImage2", item.listing.sImageTwoUrl));
+            obj.push_back(Pair("description", item.listing.sDescription));
+            obj.push_back(Pair("creationDate", DateTimeStrFormat(item.listing.nCreated)));
+            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.listing.nCreated + (7 * 24 * 60 * 60))));
+
+            ret.push_back(obj);
+        }
+    }
+
+    return ret;
+}
+
+//parameters: none
 //example: marketbuyrequests
 Value marketbuyrequests(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() == 0)
+    if (fHelp || params.size() != 0)
         throw runtime_error("marketbuyrequests \n."
                             "Returns your market buy requests.");
+
+
     return Value::null;
 }
 
 //parameters: none
-//example: marketmylistings
-Value marketmylistings(const Array& params, bool fHelp)
+//example: marketmybuys
+Value marketmybuys(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error("marketbuyrequests \n."
+                            "Returns your market buys.");
+    return Value::null;
+}
+
+//parameters: ListingID
+//example: marketcancellisting
+Value marketcancellisting(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 0)
-        throw runtime_error("marketmylistings \n."
-                            "Returns your market listings.");
+        throw runtime_error("marketcancellisting \n."
+                            "Cancels a market listing.");
+    return Value::null;
+}
+
+//parameters: ListingID
+//example: marketcancelescrow
+Value marketcancelescrow(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketcancelescrow \n."
+                            "Cancels a market escrow.");
+    return Value::null;
+}
+
+//parameters: ListingID
+//example: marketrequestpayment
+Value marketrequestpayment(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketrequestpayment \n."
+                            "Request a payment for a market item.");
+    return Value::null;
+}
+
+//parameters: ListingID Amount?
+//example: marketrefund
+Value marketrefund(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketrefund \n."
+                            "Issues a refund for a market listing.");
+    return Value::null;
+}
+
+//parameters: ListingID
+//example: marketescrowlock
+Value marketescrowlock(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketescrowlock \n."
+                            "Returns your market buy requests.");
+
+
+    return Value::null;
+}
+
+//parameters: ListingID
+//example: marketreleaseescrow
+Value marketreleaseescrow(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketescrowlock \n."
+                            "Returns your market buy requests.");
+
+
+    return Value::null;
+}
+
+//parameters: ListingID
+//example: marketrequestrefund
+Value marketrequestrefund(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketrequestrefund \n."
+                            "Returns your market buy requests.");
+
+
     return Value::null;
 }
 
@@ -257,49 +380,9 @@ Value marketsell(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error("marketsell \n."
-                            "Creates a market listing.");
+                            "Creates a new market listing.");
 
     Object result;
 
     return result;
-}
-
-//parameters: none
-//example: marketcancellisting
-Value marketcancellisting(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() == 0)
-        throw runtime_error("marketcancellisting \n."
-                            "Returns your market listings.");
-    return Value::null;
-}
-
-//parameters: none
-//example: marketcancelescrow
-Value marketcancelescrow(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() == 0)
-        throw runtime_error("marketcancelescrow \n."
-                            "Returns your market listings.");
-    return Value::null;
-}
-
-//parameters: none
-//example: marketrequestpayment
-Value marketrequestpayment(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() == 0)
-        throw runtime_error("marketrequestpayment \n."
-                            "Returns your market listings.");
-    return Value::null;
-}
-
-//parameters: none
-//example: marketrefund
-Value marketrefund(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() == 0)
-        throw runtime_error("marketrefund \n."
-                            "Returns your market listings.");
-    return Value::null;
 }
