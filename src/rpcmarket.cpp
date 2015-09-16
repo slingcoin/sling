@@ -329,7 +329,6 @@ Value marketbuyrequests(const Array& params, bool fHelp)
         CBuyRequest buyRequest = p.second;
         if(mapListings.find(buyRequest.listingId) != mapListings.end())
             {
-
             CMarketListing item = mapListings[p.first].listing;
             CTxDestination dest = mapListings[buyRequest.listingId].listing.sellerKey.GetID();
             if(IsMine(*pwalletMain, dest))
@@ -390,14 +389,6 @@ Value marketbuyrequests(const Array& params, bool fHelp)
 
                     ret.push_back(obj);
             }
-            else
-            {
-                LogPrintf("Buy Request seller key Is NOT Mine.\n", buyRequest.listingId.ToString());
-            }
-        }
-        else
-        {
-            LogPrintf("Couldn't find listing for Buy Request listing id: %s\n", buyRequest.listingId.ToString());
         }
     }
 
@@ -416,6 +407,68 @@ Value marketmybuys(const Array& params, bool fHelp)
 
     LOCK(cs_markets);
 
+    BOOST_FOREACH(PAIRTYPE(const uint256, CBuyRequest)& p, mapBuyRequests)
+    {
+
+        CTxDestination dest = p.second.buyerKey.GetID();
+        if(IsMine(*pwalletMain, dest))
+        {
+            std::string statusText = "UNKNOWN";
+            switch(p.second.nStatus)
+        {
+            case LISTED:
+            statusText = "Listed";
+            break;
+            case BUY_REQUESTED:
+            statusText = "Buy Requested";
+            break;
+            case BUY_ACCEPTED:
+            statusText = "Accepted";
+            break;
+            case BUY_REJECTED:
+            statusText = "Rejected";
+            break;
+            case ESCROW_LOCK:
+            statusText = "Escrow Locked";
+            break;
+            case DELIVERY_DETAILS:
+            statusText = "Delivery Details";
+            break;
+            case ESCROW_PAID:
+            statusText = "Escrow Paid";
+            break;
+            case REFUND_REQUESTED:
+            statusText = "Refund Requested";
+            break;
+            case REFUNDED:
+            statusText = "Refunded";
+            break;
+            case PAYMENT_REQUESTED:
+            statusText = "Payment Requested";
+            break;
+            default:
+            statusText = "UNKNOWN";
+            break;
+        }
+
+            Object obj;
+            CMarketListing item = mapListings[p.first].listing;
+
+            obj.push_back(Pair("title", item.sTitle));
+            obj.push_back(Pair("category", item.sCategory));
+            obj.push_back(Pair("itemId", item.GetHash().ToString()));
+            obj.push_back(Pair("vendorId", CBitcoinAddress(item.sellerKey.GetID()).ToString()));
+            obj.push_back(Pair("price", QString::number(item.nPrice / COIN, 'f', 8).toStdString()));
+            obj.push_back(Pair("status", statusText));
+            obj.push_back(Pair("urlImage1", item.sImageOneUrl));
+            obj.push_back(Pair("urlImage2", item.sImageTwoUrl));
+            obj.push_back(Pair("description", item.sDescription));
+            obj.push_back(Pair("creationDate", DateTimeStrFormat(item.nCreated)));
+            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.nCreated + (LISTING_DEFAULT_DURATION))));
+            //TODO: needs date bought..
+            ret.push_back(obj);
+        }
+    }
 
     return ret;
 }
