@@ -197,7 +197,7 @@ Value marketapprovebuy(const Array& params, bool fHelp)
     // serialize the tx to a string
     CDataStream ssTx(SER_NETWORK, CLIENT_VERSION);
     ssTx.reserve(sizeof(wtxNew));
-        ssTx << wtxNew;
+    ssTx << wtxNew;
 
     // misuse this parameter like a boss
     accept.raw = ssTx.str();
@@ -324,7 +324,7 @@ Value marketcancelescrow(const Array& params, bool fHelp)
 Value marketrequestpayment(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 0)
-        throw runtime_error("marketrequestpayment \n."
+        throw runtime_error("marketrequestpayment ListingID \n."
                             "Request a payment for a market item.");
     return Value::null;
 }
@@ -363,26 +363,55 @@ Value marketreleaseescrow(const Array& params, bool fHelp)
     return Value::null;
 }
 
-//parameters: ListingID
-//example: marketrequestrefund
 Value marketrequestrefund(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 0)
-        throw runtime_error("marketrequestrefund \n."
-                            "Returns your market buy requests.");
+        throw runtime_error("marketrequestrefund\n"
+                            "Returns your market buy requests\n"
+                            "parameters: <listingId>");
 
 
     return Value::null;
 }
 
-//parameters: {JSON}
 Value marketsell(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() != 0)
-        throw runtime_error("marketsell \n."
-                            "Creates a new market listing.");
+    if (fHelp || params.size() != 6)
+        throw runtime_error("marketsell\n"
+                            "Creates a new market listing\n"
+                            "parameters: <title> <category> <price> <image1> <image2> <description> \n");
 
-    Object result;
+    std::string title = params[0].get_str();
+    std::string category = params[1].get_str();
+    std::string price = params[2].get_str();
+    std::string image1 = params[3].get_str();
+    std::string image2 = params[4].get_str();
+    std::string description = params[5].get_str();
 
-    return result;
+    // create market listing object
+    CMarketListing listing;
+    listing.sTitle = title;
+    listing.sCategory = category;
+    //listing.nPrice = convertDouble(price) * COIN;
+    listing.nPrice = 100; //TODO: Change This!
+    listing.sImageOneUrl = image1;
+    listing.sImageTwoUrl = image2;
+    listing.sDescription = description;
+    listing.nCreated = GetTime();
+    listing.sellerKey = pwalletMain->GenerateNewKey();
+
+    CSignedMarketListing signedListing;
+    signedListing.listing = listing;
+    SignListing(listing, signedListing.vchListingSig);
+    signedListing.BroadcastToAll();
+    ReceiveListing(signedListing);
+
+    Object obj;
+
+    obj.push_back(Pair("sellerKey", listing.sellerKey.GetHash().ToString()));
+    obj.push_back(Pair("listingKey", signedListing.GetHash().ToString()));
+
+    //ret.push_back(obj);
+
+    return obj;
 }
