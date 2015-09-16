@@ -73,7 +73,7 @@ Value marketalllistings(const Array& params, bool fHelp)
     return ret;
 }
 
-//parameters: search string
+//parameters: search hammers
 //example: marketsearchlistings aveng
 Value marketsearchlistings(const Array& params, bool fHelp)
 {
@@ -135,7 +135,7 @@ Value marketsearchlistings(const Array& params, bool fHelp)
     return ret;
 }
 
-//parameters: ItemID
+//parameters: ListingID
 //example: marketbuy d6560d158876e79043be5202844e7b7fa01839894f7251d1056d5a349f946cbe
 Value marketbuy(const Array& params, bool fHelp)
 {
@@ -157,11 +157,98 @@ Value marketbuy(const Array& params, bool fHelp)
     return Value::null;;
 }
 
-//parameters: ItemID Approval
-//example: marketbuyapproval d6560d158876e79043be5202844e7b7fa01839894f7251d1056d5a349f946cbe
-Value marketbuyapproval(const Array& params, bool fHelp)
+//parameters: ListingID RequestID
+//example: marketapprovebuy d6560d158876e79043be5202844e7b7fa01839894f7251d1056d5a349f946cbe c6dad3be5202844e7b7fa01839894f7251d1056d5a349f946cbe
+Value marketapprovebuy(const Array& params, bool fHelp)
 {
+    if (fHelp || params.size() == 2)
+        throw runtime_error("marketapprovebuy \n."
+                            "Approves market listing buy request.");
 
+    string itemID = params[0].get_str();
+    string requestID = params[1].get_str();
+
+    uint256 idListingHash = uint256(itemID);
+    uint256 idRequestHash = uint256(requestID);
+
+    CBuyAccept accept;
+    accept.listingId = idListingHash;
+    accept.buyRequestId = idRequestHash;
+    accept.nDate = GetTime();
+    accept.sellerKey = pwalletMain->GenerateNewKey();
+
+    CBuyRequest buyRequest = mapBuyRequests[idRequestHash];
+    // create the escrow lock address
+    std::string errors;
+    std::string escrowAddress;
+
+    AddMultisigAddress(mapListings[idListingHash].listing.sellerKey, mapBuyRequests[idRequestHash].buyerKey, escrowAddress, errors);
+    accept.escrowAddress = escrowAddress;
+
+    // fund it
+    std::string strError = "";
+    CWalletTx wtxNew;
+
+    CreateEscrowLockTx(accept.escrowAddress, mapListings[buyRequest.listingId].listing.nPrice + (0.01 * COIN), strError, wtxNew);
+
+    // serialize the tx to a string
+    CDataStream ssTx(SER_NETWORK, CLIENT_VERSION);
+    ssTx.reserve(sizeof(wtxNew));
+        ssTx << wtxNew;
+
+    // misuse this parameter like a boss
+    accept.raw = ssTx.str();
+
+    SignBuyAccept(accept, accept.vchSig);
+    ReceiveBuyAccept(accept);
+    accept.BroadcastToAll();
+
+    return Value::null;;
+}
+
+//parameters: ListingID RequestID
+//example: marketrejectbuy d6560d158876e79043be5202844e7b7fa01839894f7251d1056d5a349f946cbe c6dad3be5202844e7b7fa01839894f7251d1056d5a349f946cbe
+Value marketrejectbuy(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 2)
+        throw runtime_error("marketrejectbuy \n."
+                            "Rejects market listing buy request.");
+
+    string itemID = params[0].get_str();
+    string requestID = params[1].get_str();
+
+    uint256 idListingHash = uint256(itemID);
+    uint256 idRequestHash = uint256(requestID);
+
+    CBuyReject reject;
+    reject.listingId = idListingHash;
+    reject.buyRequestId = idRequestHash;
+    reject.nDate = GetTime();
+    reject.sellerKey = pwalletMain->GenerateNewKey();
+    SignBuyReject(reject, reject.vchSig);
+    ReceiveBuyReject(reject);
+    reject.BroadcastToAll();
+
+    return Value::null;;
+}
+
+//parameters: none
+//example: marketbuyrequests
+Value marketbuyrequests(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketbuyrequests \n."
+                            "Returns your market buy requests.");
+    return Value::null;;
+}
+
+//parameters: none
+//example: marketmylistings
+Value marketmylistings(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketmylistings \n."
+                            "Returns your market listings.");
     return Value::null;;
 }
 

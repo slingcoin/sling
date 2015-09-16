@@ -325,12 +325,14 @@ static const CRPCCommand vRPCCommands[] =
     { "smsgsendanon",           &smsgsendanon,           false,     false,     false },
     { "smsginbox",              &smsginbox,              false,     false,     false },
     { "smsgoutbox",             &smsgoutbox,             false,     false,     false },
-//added for Market UI
     { "marketalllistings",      &marketalllistings,      false,     false,     false },
     { "marketsearchlistings",   &marketsearchlistings,   false,     false,     false },
     { "marketbuy",              &marketbuy,              false,     false,     false },
     { "marketsell",             &marketsell,             false,     false,     false },
-
+    { "marketapprovebuy",       &marketapprovebuy,       false,     false,     false },
+    { "marketrejectbuy",        &marketrejectbuy,       false,     false,     false },
+    { "marketbuyrequests",      &marketbuyrequests,       false,     false,     false },
+    { "marketmylistings",       &marketmylistings,       false,     false,     false },
 #endif
 };
 
