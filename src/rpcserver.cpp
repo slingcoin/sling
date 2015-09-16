@@ -330,9 +330,13 @@ static const CRPCCommand vRPCCommands[] =
     { "marketbuy",              &marketbuy,              false,     false,     false },
     { "marketsell",             &marketsell,             false,     false,     false },
     { "marketapprovebuy",       &marketapprovebuy,       false,     false,     false },
-    { "marketrejectbuy",        &marketrejectbuy,       false,     false,     false },
-    { "marketbuyrequests",      &marketbuyrequests,       false,     false,     false },
+    { "marketrejectbuy",        &marketrejectbuy,        false,     false,     false },
+    { "marketbuyrequests",      &marketbuyrequests,      false,     false,     false },
     { "marketmylistings",       &marketmylistings,       false,     false,     false },
+    { "marketcancellisting",    &marketcancellisting,    false,     false,     false },
+    { "marketcancelescrow",     &marketcancelescrow,     false,     false,     false },
+    { "marketrequestpayment",   &marketrequestpayment,   false,     false,     false },
+    { "marketrefund",           &marketrefund,           false,     false,     false },
 #endif
 };
 

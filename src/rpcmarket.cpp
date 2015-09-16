@@ -79,7 +79,7 @@ Value marketsearchlistings(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 0)
         throw runtime_error("marketalllistings \n."
-                            "List of all active market listings.");
+                            "List active market listings that meet search criteria.");
 
     string strSearch = params[0].get_str();
     std::transform(strSearch.begin(), strSearch.end(),strSearch.begin(), ::tolower);
@@ -154,7 +154,7 @@ Value marketbuy(const Array& params, bool fHelp)
     ReceiveBuyRequest(buyRequest);
     buyRequest.BroadcastToAll();
 
-    return Value::null;;
+    return Value::null;
 }
 
 //parameters: ListingID RequestID
@@ -203,7 +203,7 @@ Value marketapprovebuy(const Array& params, bool fHelp)
     ReceiveBuyAccept(accept);
     accept.BroadcastToAll();
 
-    return Value::null;;
+    return Value::null;
 }
 
 //parameters: ListingID RequestID
@@ -229,7 +229,7 @@ Value marketrejectbuy(const Array& params, bool fHelp)
     ReceiveBuyReject(reject);
     reject.BroadcastToAll();
 
-    return Value::null;;
+    return Value::null;
 }
 
 //parameters: none
@@ -239,7 +239,7 @@ Value marketbuyrequests(const Array& params, bool fHelp)
     if (fHelp || params.size() == 0)
         throw runtime_error("marketbuyrequests \n."
                             "Returns your market buy requests.");
-    return Value::null;;
+    return Value::null;
 }
 
 //parameters: none
@@ -249,16 +249,57 @@ Value marketmylistings(const Array& params, bool fHelp)
     if (fHelp || params.size() == 0)
         throw runtime_error("marketmylistings \n."
                             "Returns your market listings.");
-    return Value::null;;
+    return Value::null;
 }
 
 //parameters: {JSON}
 Value marketsell(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        throw runtime_error("marketsell \n.""Creates a market listing.");
+        throw runtime_error("marketsell \n."
+                            "Creates a market listing.");
 
     Object result;
 
     return result;
+}
+
+//parameters: none
+//example: marketcancellisting
+Value marketcancellisting(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketcancellisting \n."
+                            "Returns your market listings.");
+    return Value::null;
+}
+
+//parameters: none
+//example: marketcancelescrow
+Value marketcancelescrow(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketcancelescrow \n."
+                            "Returns your market listings.");
+    return Value::null;
+}
+
+//parameters: none
+//example: marketrequestpayment
+Value marketrequestpayment(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketrequestpayment \n."
+                            "Returns your market listings.");
+    return Value::null;
+}
+
+//parameters: none
+//example: marketrefund
+Value marketrefund(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() == 0)
+        throw runtime_error("marketrefund \n."
+                            "Returns your market listings.");
+    return Value::null;
 }

@@ -216,5 +216,9 @@ extern json_spirit::Value marketapprovebuy(const json_spirit::Array& params, boo
 extern json_spirit::Value marketrejectbuy(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value marketbuyrequests(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value marketmylistings(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketcancellisting(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketcancelescrow(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketrequestpayment(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value marketrefund(const json_spirit::Array& params, bool fHelp);
 
 #endif
