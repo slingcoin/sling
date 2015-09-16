@@ -41,6 +41,7 @@ void SlingRoad::on_categoriesListWidget_currentItemChanged(QListWidgetItem* curr
     std::set<CSignedMarketListing> listings = mapListingsByCategory[cat];
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
+
     LOCK(cs_markets);
     BOOST_FOREACH(CSignedMarketListing p, listings)
     {
@@ -75,6 +76,7 @@ void SlingRoad::on_categoriesListWidget_currentItemChanged(QListWidgetItem* curr
         ui->tableWidget->setItem(0, 4, titleItem);
         ui->tableWidget->setItem(0, 5, idItem);
     }
+
 }
 
 
@@ -143,7 +145,7 @@ void SlingRoad::on_tableWidget_itemSelectionChanged()
     {
         ui->buyButton->setEnabled(true);
         ui->viewDetailsButton->setEnabled(true);
-	ui->copyAddressButton->setEnabled(true);
+        ui->copyAddressButton->setEnabled(true);
     }
 }
 

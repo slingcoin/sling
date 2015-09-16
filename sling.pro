@@ -284,7 +284,8 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/createmarketlistingdialog.h \
     src/qt/marketlistingdetailsdialog.h \
     src/qt/deliverydetailsdialog.h \
-    src/market.h
+    src/market.h \
+    src/rpcmarket.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
