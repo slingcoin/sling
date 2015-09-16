@@ -2,6 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "rpcmarket.h"
 #include "main.h"
 #include "rpcserver.h"
 #include "market.h"
@@ -17,13 +18,12 @@
 
 using namespace json_spirit;
 
-//parameters: none
-//example: marketalllistings
 Value marketalllistings(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        throw runtime_error("marketalllistings \n."
-                            "List of all active market listings.");
+        throw runtime_error("marketalllistings \n"
+                            "List of all active market listings \n"
+                            "parameters: none");
 
     Array ret;
 
@@ -55,7 +55,7 @@ Value marketalllistings(const Array& params, bool fHelp)
 
             obj.push_back(Pair("title", item.listing.sTitle));
             obj.push_back(Pair("category", item.listing.sCategory));
-            obj.push_back(Pair("id", item.GetHash().ToString()));
+            obj.push_back(Pair("itemId", item.GetHash().ToString()));
             obj.push_back(Pair("vendorId", CBitcoinAddress(item.listing.sellerKey.GetID()).ToString()));
             obj.push_back(Pair("price", QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString()));
             obj.push_back(Pair("status", item.listing.nStatus));
@@ -63,7 +63,7 @@ Value marketalllistings(const Array& params, bool fHelp)
             obj.push_back(Pair("urlImage2", item.listing.sImageTwoUrl));
             obj.push_back(Pair("description", item.listing.sDescription));
             obj.push_back(Pair("creationDate", DateTimeStrFormat(item.listing.nCreated)));
-            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.listing.nCreated + (7 * 24 * 60 * 60))));
+            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.listing.nCreated + (LISTING_DEFAULT_DURATION))));
 
             ret.push_back(obj);
         }
@@ -73,13 +73,12 @@ Value marketalllistings(const Array& params, bool fHelp)
     return ret;
 }
 
-//parameters: search hammers
-//example: marketsearchlistings aveng
 Value marketsearchlistings(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 0)
-        throw runtime_error("marketalllistings \n."
-                            "List active market listings that meet search criteria.");
+        throw runtime_error("marketalllistings \n"
+                            "List active market listings that meet search criteria \n"
+                            "parameters: <search>");
 
     string strSearch = params[0].get_str();
     std::transform(strSearch.begin(), strSearch.end(),strSearch.begin(), ::tolower);
@@ -119,7 +118,7 @@ Value marketsearchlistings(const Array& params, bool fHelp)
 
             obj.push_back(Pair("title", item.listing.sTitle));
             obj.push_back(Pair("category", item.listing.sCategory));
-            obj.push_back(Pair("id", item.GetHash().ToString()));
+            obj.push_back(Pair("itemId", item.GetHash().ToString()));
             obj.push_back(Pair("vendorId", CBitcoinAddress(item.listing.sellerKey.GetID()).ToString()));
             obj.push_back(Pair("price", QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString()));
             obj.push_back(Pair("status", item.listing.nStatus));
@@ -127,7 +126,7 @@ Value marketsearchlistings(const Array& params, bool fHelp)
             obj.push_back(Pair("urlImage2", item.listing.sImageTwoUrl));
             obj.push_back(Pair("description", item.listing.sDescription));
             obj.push_back(Pair("creationDate", DateTimeStrFormat(item.listing.nCreated)));
-            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.listing.nCreated + (7 * 24 * 60 * 60))));
+            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.listing.nCreated + (LISTING_DEFAULT_DURATION))));
 
 
             ret.push_back(obj);
@@ -138,12 +137,12 @@ Value marketsearchlistings(const Array& params, bool fHelp)
     return ret;
 }
 
-//parameters: ListingID
-//example: marketbuy d6560d158876e79043be5202844e7b7fa01839894f7251d1056d5a349f946cbe
 Value marketbuy(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 0)
-        throw runtime_error("marketbuy \n.""Buys a market listing.");
+        throw runtime_error("marketbuy \n"
+                            "Buys a market listing \n"
+                            "parameters: <listingId>");
 
     string itemID = params[0].get_str();
     uint256 idHash = uint256(itemID);
@@ -160,13 +159,12 @@ Value marketbuy(const Array& params, bool fHelp)
     return Value::null;
 }
 
-//parameters: ListingID RequestID
-//example: marketapprovebuy d6560d158876e79043be5202844e7b7fa01839894f7251d1056d5a349f946cbe c6dad3be5202844e7b7fa01839894f7251d1056d5a349f946cbe
 Value marketapprovebuy(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 2)
-        throw runtime_error("marketapprovebuy \n."
-                            "Approves market listing buy request.");
+        throw runtime_error("marketapprovebuy \n"
+                            "Approves market listing buy request \n"
+                            "parameters: <listingId> <requestId>");
 
     string itemID = params[0].get_str();
     string requestID = params[1].get_str();
@@ -209,13 +207,12 @@ Value marketapprovebuy(const Array& params, bool fHelp)
     return Value::null;
 }
 
-//parameters: ListingID RequestID
-//example: marketrejectbuy d6560d158876e79043be5202844e7b7fa01839894f7251d1056d5a349f946cbe c6dad3be5202844e7b7fa01839894f7251d1056d5a349f946cbe
 Value marketrejectbuy(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 2)
-        throw runtime_error("marketrejectbuy \n."
-                            "Rejects market listing buy request.");
+        throw runtime_error("marketrejectbuy \n"
+                            "Rejects market listing buy request \n"
+                            "parameters: <listingId> <requestId>");
 
     string itemID = params[0].get_str();
     string requestID = params[1].get_str();
@@ -235,13 +232,12 @@ Value marketrejectbuy(const Array& params, bool fHelp)
     return Value::null;
 }
 
-//parameters: none
-//example: marketmylistings
 Value marketmylistings(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        throw runtime_error("marketmylistings \n."
-                            "Returns your market listings.");
+        throw runtime_error("marketmylistings \n"
+                            "Gets your market listings \n"
+                            "parameters: none\n");
 
     Array ret;
 
@@ -260,7 +256,7 @@ Value marketmylistings(const Array& params, bool fHelp)
 
             obj.push_back(Pair("title", item.listing.sTitle));
             obj.push_back(Pair("category", item.listing.sCategory));
-            obj.push_back(Pair("id", item.GetHash().ToString()));
+            obj.push_back(Pair("itemId", item.GetHash().ToString()));
             obj.push_back(Pair("vendorId", CBitcoinAddress(item.listing.sellerKey.GetID()).ToString()));
             obj.push_back(Pair("price", QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString()));
             obj.push_back(Pair("status", item.listing.nStatus));
@@ -268,7 +264,7 @@ Value marketmylistings(const Array& params, bool fHelp)
             obj.push_back(Pair("urlImage2", item.listing.sImageTwoUrl));
             obj.push_back(Pair("description", item.listing.sDescription));
             obj.push_back(Pair("creationDate", DateTimeStrFormat(item.listing.nCreated)));
-            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.listing.nCreated + (7 * 24 * 60 * 60))));
+            obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.listing.nCreated + (LISTING_DEFAULT_DURATION))));
 
             ret.push_back(obj);
         }
@@ -277,26 +273,151 @@ Value marketmylistings(const Array& params, bool fHelp)
     return ret;
 }
 
-//parameters: none
-//example: marketbuyrequests
-Value marketbuyrequests(const Array& params, bool fHelp)
+Value marketsell(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() != 0)
-        throw runtime_error("marketbuyrequests \n."
-                            "Returns your market buy requests.");
+    if (fHelp || params.size() != 6)
+        throw runtime_error("marketsell\n"
+                            "Creates a new market listing\n"
+                            "parameters: <title> <category> <price> <image1> <image2> <description> \n");
 
+    std::string title = params[0].get_str();
+    std::string category = params[1].get_str();
+    double price = boost::lexical_cast<double>(params[2].get_str());;
+    std::string image1 = params[3].get_str();
+    std::string image2 = params[4].get_str();
+    std::string description = params[5].get_str();
 
-    return Value::null;
+    // create market listing object
+    CMarketListing listing;
+    listing.sTitle = title;
+    listing.sCategory = category;
+    listing.nPrice = price * COIN;
+    listing.sImageOneUrl = image1;
+    listing.sImageTwoUrl = image2;
+    listing.sDescription = description;
+    listing.nCreated = GetTime();
+    listing.sellerKey = pwalletMain->GenerateNewKey();
+
+    CSignedMarketListing signedListing;
+    signedListing.listing = listing;
+    SignListing(listing, signedListing.vchListingSig);
+    signedListing.BroadcastToAll();
+    ReceiveListing(signedListing);
+
+    Object obj;
+
+    obj.push_back(Pair("sellerKey", listing.sellerKey.GetHash().ToString()));
+    obj.push_back(Pair("listingKey", signedListing.GetHash().ToString()));
+
+    return obj;
 }
 
-//parameters: none
-//example: marketmybuys
+Value marketbuyrequests(const Array& params, bool fHelp)
+{
+    //BUG: tinyformat: Not enough conversion specifiers in format string (code -1)
+    if (fHelp || params.size() != 0)
+        throw runtime_error("marketbuyrequests \n"
+                            "Returns your market buy requests \n"
+                            "parameters: none \n");
+    Array ret;
+
+    LOCK(cs_markets);
+
+    BOOST_FOREACH(PAIRTYPE(const uint256, CBuyRequest)& p, mapBuyRequests)
+    {
+        // if it is a buy request for one of our listings, add it to the JSON array
+        CBuyRequest buyRequest = p.second;
+        if(mapListings.find(buyRequest.listingId) != mapListings.end())
+            {
+
+            CMarketListing item = mapListings[p.first].listing;
+            CTxDestination dest = mapListings[buyRequest.listingId].listing.sellerKey.GetID();
+            if(IsMine(*pwalletMain, dest))
+                {
+                    Object obj;
+
+                    std::string statusText = "UNKNOWN";
+                    switch(item.nStatus)
+                    {
+                        case LISTED:
+                        statusText = "Listed";
+                        break;
+                        case BUY_REQUESTED:
+                        statusText = "Buy Requested";
+                        break;
+                        case BUY_ACCEPTED:
+                        statusText = "Accepted";
+                        break;
+                        case BUY_REJECTED:
+                        statusText = "Rejected";
+                        break;
+                        case ESCROW_LOCK:
+                        statusText = "Escrow Locked";
+                        break;
+                        case DELIVERY_DETAILS:
+                        statusText = "Delivery Details";
+                        break;
+                        case ESCROW_PAID:
+                        statusText = "Escrow Paid";
+                        break;
+                        case REFUND_REQUESTED:
+                        statusText = "Refund Requested";
+                        break;
+                        case REFUNDED:
+                        statusText = "Refunded";
+                        break;
+                        case PAYMENT_REQUESTED:
+                        statusText = "Payment Requested";
+                        break;
+                        default:
+                        statusText = "UNKNOWN";
+                        break;
+                    }
+
+                    obj.push_back(Pair("buyerId", buyRequest.buyerKey.GetID().ToString()));
+                    obj.push_back(Pair("title", item.sTitle));
+                    obj.push_back(Pair("category", item.sCategory));
+                    obj.push_back(Pair("itemId", item.GetHash().ToString()));
+                    obj.push_back(Pair("vendorId", CBitcoinAddress(item.sellerKey.GetID()).ToString()));
+                    obj.push_back(Pair("price", QString::number(item.nPrice / COIN, 'f', 8).toStdString()));
+                    obj.push_back(Pair("status", statusText));
+                    obj.push_back(Pair("urlImage1", item.sImageOneUrl));
+                    obj.push_back(Pair("urlImage2", item.sImageTwoUrl));
+                    obj.push_back(Pair("description", item.sDescription));
+                    obj.push_back(Pair("creationDate", DateTimeStrFormat(item.nCreated)));
+                    obj.push_back(Pair("expirationDate", DateTimeStrFormat(item.nCreated + (LISTING_DEFAULT_DURATION))));
+                    obj.push_back(Pair("buyRequestDate", DateTimeStrFormat(buyRequest.nDate)));
+
+                    ret.push_back(obj);
+            }
+            else
+            {
+                LogPrintf("Buy Request seller key Is NOT Mine.\n", buyRequest.listingId.ToString());
+            }
+        }
+        else
+        {
+            LogPrintf("Couldn't find listing for Buy Request listing id: %s\n", buyRequest.listingId.ToString());
+        }
+    }
+
+    return ret;
+}
+
 Value marketmybuys(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        throw runtime_error("marketbuyrequests \n."
-                            "Returns your market buys.");
-    return Value::null;
+        throw runtime_error("marketmybuys \n"
+                            "Returns your market buys \n"
+                            "parameters: none");
+
+
+    Array ret;
+
+    LOCK(cs_markets);
+
+
+    return ret;
 }
 
 //parameters: ListingID
@@ -374,44 +495,4 @@ Value marketrequestrefund(const Array& params, bool fHelp)
     return Value::null;
 }
 
-Value marketsell(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 6)
-        throw runtime_error("marketsell\n"
-                            "Creates a new market listing\n"
-                            "parameters: <title> <category> <price> <image1> <image2> <description> \n");
 
-    std::string title = params[0].get_str();
-    std::string category = params[1].get_str();
-    std::string price = params[2].get_str();
-    std::string image1 = params[3].get_str();
-    std::string image2 = params[4].get_str();
-    std::string description = params[5].get_str();
-
-    // create market listing object
-    CMarketListing listing;
-    listing.sTitle = title;
-    listing.sCategory = category;
-    //listing.nPrice = convertDouble(price) * COIN;
-    listing.nPrice = 100; //TODO: Change This!
-    listing.sImageOneUrl = image1;
-    listing.sImageTwoUrl = image2;
-    listing.sDescription = description;
-    listing.nCreated = GetTime();
-    listing.sellerKey = pwalletMain->GenerateNewKey();
-
-    CSignedMarketListing signedListing;
-    signedListing.listing = listing;
-    SignListing(listing, signedListing.vchListingSig);
-    signedListing.BroadcastToAll();
-    ReceiveListing(signedListing);
-
-    Object obj;
-
-    obj.push_back(Pair("sellerKey", listing.sellerKey.GetHash().ToString()));
-    obj.push_back(Pair("listingKey", signedListing.GetHash().ToString()));
-
-    //ret.push_back(obj);
-
-    return obj;
-}

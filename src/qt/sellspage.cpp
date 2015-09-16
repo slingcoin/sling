@@ -442,6 +442,7 @@ void SellsPage::LoadBuyRequests(QString q)
 	    LogPrintf("Couldn't find listing for Buy Request listing id: %s\n", p.second.listingId.ToString());
 	}
     }
+
 }
 
 void SellsPage::updateListing(QString id, QString expires, QString price, QString title)

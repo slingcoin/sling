@@ -516,7 +516,7 @@ void BitcoinGUI::createMenuBar()
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
 }
-
+/*
 static QWidget* makeToolBarSpacer()
 {
     QWidget* spacer = new QWidget();
@@ -524,7 +524,7 @@ static QWidget* makeToolBarSpacer()
     spacer->setStyleSheet("QWidget { background: none; }");
     return spacer;
 }
-
+*/
 void BitcoinGUI::createToolBars()
 {
     toolbar = new QToolBar(tr("Tabs toolbar"));
