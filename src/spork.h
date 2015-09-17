@@ -22,7 +22,6 @@ using namespace boost;
 #define SPORK_1_MASTERNODE_PAYMENTS_ENFORCEMENT               10000
 #define SPORK_2_MAX_VALUE                                     10002
 #define SPORK_3_REPLAY_BLOCKS                                 10003
-#define SPORK_4_NOTUSED                                       10004
 
 
 #define SPORK_1_MASTERNODE_PAYMENTS_ENFORCEMENT_DEFAULT       1443657600  //2015-10-01 00:00:00 GMT
