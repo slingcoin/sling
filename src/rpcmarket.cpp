@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The Sling developers
+// Copyright (c) 2014-2015 The Sling developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -32,7 +32,6 @@ Value marketalllistings(const Array& params, bool fHelp)
     BOOST_FOREACH(PAIRTYPE(const uint256, CSignedMarketListing)& p, mapListings)
     {
         // only show if no buy requests
-        bool bFound = false;
         CSignedMarketListing item = p.second;
 
         BOOST_FOREACH(PAIRTYPE(const uint256, CBuyRequest)& b, mapBuyRequests)
@@ -41,13 +40,11 @@ Value marketalllistings(const Array& params, bool fHelp)
             {
                 if(b.second.nStatus != LISTED || b.second.nStatus != BUY_REQUESTED)
                 {
-                    bFound = true;
+                    //found
+                    continue; // go to next item, this one someone is already buying
                 }
             }
         }
-
-        if(bFound)
-            continue; // go to next item, this one someone is already buying
 
         if (item.listing.sTitle != "")
         {
@@ -328,7 +325,7 @@ Value marketbuyrequests(const Array& params, bool fHelp)
         if(mapListings.find(buyRequest.listingId) != mapListings.end())
             {
             CMarketListing item = mapListings[buyRequest.listingId].listing;
-            CTxDestination dest = mapListings[buyRequest.listingId].listing.sellerKey.GetID();
+            CTxDestination dest = item.sellerKey.GetID();
             if(IsMine(*pwalletMain, dest))
                 {
                     Object obj;
@@ -549,7 +546,7 @@ Value marketrefund(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() == 0)
         throw runtime_error("marketrefund \n"
-                            "Issues a refund for a market listing \n"
+                            "Issues a refund for a buy request \n"
                             "parameters: <requestId>");
     //TODO: SegFault:
     string requestID = params[0].get_str();

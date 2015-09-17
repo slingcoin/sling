@@ -787,6 +787,7 @@ void ServiceConnection(AcceptedConnection *conn)
             /* Deter brute-forcing short passwords.
                If this results in a DoS the user really
                shouldn't have their RPC port exposed. */
+
             if (mapArgs["-rpcpassword"].size() < 20)
                 MilliSleep(250);
 
