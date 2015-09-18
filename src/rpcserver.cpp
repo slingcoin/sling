@@ -325,7 +325,22 @@ static const CRPCCommand vRPCCommands[] =
     { "smsgsendanon",           &smsgsendanon,           false,     false,     false },
     { "smsginbox",              &smsginbox,              false,     false,     false },
     { "smsgoutbox",             &smsgoutbox,             false,     false,     false },
-    { "smsgbuckets",            &smsgbuckets,            false,     false,     false },
+    { "marketalllistings",      &marketalllistings,      false,     false,     false },
+    { "marketsearchlistings",   &marketsearchlistings,   false,     false,     false },
+    { "marketbuy",              &marketbuy,              false,     false,     false },
+    { "marketsell",             &marketsell,             false,     false,     false },
+    { "marketapprovebuy",       &marketapprovebuy,       false,     false,     false },
+    { "marketrejectbuy",        &marketrejectbuy,        false,     false,     false },
+    { "marketbuyrequests",      &marketbuyrequests,      false,     false,     false },
+    { "marketmylistings",       &marketmylistings,       false,     false,     false },
+    { "marketcancellisting",    &marketcancellisting,    false,     false,     false },
+    { "marketcancelescrow",     &marketcancelescrow,     false,     false,     false },
+    { "marketrequestpayment",   &marketrequestpayment,   false,     false,     false },
+    { "marketrefund",           &marketrefund,           false,     false,     false },
+    { "marketmybuys",           &marketmybuys,           false,     false,     false },
+    { "marketescrowlock",       &marketescrowlock,       false,     false,     false },
+    { "marketreleaseescrow",    &marketreleaseescrow,    false,     false,     false },
+    { "marketrequestrefund",    &marketrequestrefund,    false,     false,     false },
 #endif
 };
 
@@ -772,6 +787,7 @@ void ServiceConnection(AcceptedConnection *conn)
             /* Deter brute-forcing short passwords.
                If this results in a DoS the user really
                shouldn't have their RPC port exposed. */
+
             if (mapArgs["-rpcpassword"].size() < 20)
                 MilliSleep(250);
 
