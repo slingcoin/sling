@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = sling-markets
-VERSION = 2.0.0.1
+VERSION = 2.0.0.2
 INCLUDEPATH += src src/json src/qt src/qt/plugins/mrichtexteditor
 QT += network printsupport script
 DEFINES += ENABLE_WALLET

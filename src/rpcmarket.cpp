@@ -12,10 +12,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/assign/list_of.hpp>
 
-#include <json_spirit_value.h>
-
-#include <QWidget>
-
+using namespace boost;
 using namespace json_spirit;
 
 Value marketalllistings(const Array& params, bool fHelp)
@@ -49,12 +46,12 @@ Value marketalllistings(const Array& params, bool fHelp)
         if (item.listing.sTitle != "")
         {
             Object obj;
-
+            //int price
             obj.push_back(Pair("title", item.listing.sTitle));
             obj.push_back(Pair("category", item.listing.sCategory));
             obj.push_back(Pair("itemId", item.GetHash().ToString()));
             obj.push_back(Pair("vendorId", CBitcoinAddress(item.listing.sellerKey.GetID()).ToString()));
-            obj.push_back(Pair("price", QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString()));
+            obj.push_back(Pair("price", lexical_cast<string>((item.listing.nPrice / COIN, 'f', 8))));
             obj.push_back(Pair("status", item.listing.nStatus));
             obj.push_back(Pair("urlImage1", item.listing.sImageOneUrl));
             obj.push_back(Pair("urlImage2", item.listing.sImageTwoUrl));
@@ -117,7 +114,7 @@ Value marketsearchlistings(const Array& params, bool fHelp)
             obj.push_back(Pair("category", item.listing.sCategory));
             obj.push_back(Pair("itemId", item.GetHash().ToString()));
             obj.push_back(Pair("vendorId", CBitcoinAddress(item.listing.sellerKey.GetID()).ToString()));
-            obj.push_back(Pair("price", QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString()));
+            obj.push_back(Pair("price", lexical_cast<string>((item.listing.nPrice / COIN, 'f', 8))));
             obj.push_back(Pair("status", item.listing.nStatus));
             obj.push_back(Pair("urlImage1", item.listing.sImageOneUrl));
             obj.push_back(Pair("urlImage2", item.listing.sImageTwoUrl));
@@ -254,7 +251,7 @@ Value marketmylistings(const Array& params, bool fHelp)
             obj.push_back(Pair("category", item.listing.sCategory));
             obj.push_back(Pair("itemId", item.GetHash().ToString()));
             obj.push_back(Pair("vendorId", CBitcoinAddress(item.listing.sellerKey.GetID()).ToString()));
-            obj.push_back(Pair("price", QString::number(item.listing.nPrice / COIN, 'f', 8).toStdString()));
+            obj.push_back(Pair("price", lexical_cast<string>((item.listing.nPrice / COIN, 'f', 8))));
             obj.push_back(Pair("status", item.listing.nStatus));
             obj.push_back(Pair("urlImage1", item.listing.sImageOneUrl));
             obj.push_back(Pair("urlImage2", item.listing.sImageTwoUrl));
@@ -374,7 +371,7 @@ Value marketbuyrequests(const Array& params, bool fHelp)
                     obj.push_back(Pair("category", item.sCategory));
                     obj.push_back(Pair("itemId", item.GetHash().ToString()));
                     obj.push_back(Pair("vendorId", CBitcoinAddress(item.sellerKey.GetID()).ToString()));
-                    obj.push_back(Pair("price", QString::number(item.nPrice / COIN, 'f', 8).toStdString()));
+                    obj.push_back(Pair("price", lexical_cast<string>((item.nPrice / COIN, 'f', 8))));
                     obj.push_back(Pair("status", statusText));
                     obj.push_back(Pair("urlImage1", item.sImageOneUrl));
                     obj.push_back(Pair("urlImage2", item.sImageTwoUrl));
@@ -453,7 +450,7 @@ Value marketmybuys(const Array& params, bool fHelp)
             obj.push_back(Pair("category", item.sCategory));
             obj.push_back(Pair("itemId", item.GetHash().ToString()));
             obj.push_back(Pair("vendorId", CBitcoinAddress(item.sellerKey.GetID()).ToString()));
-            obj.push_back(Pair("price", QString::number(item.nPrice / COIN, 'f', 8).toStdString()));
+            obj.push_back(Pair("price", lexical_cast<string>((item.nPrice / COIN, 'f', 8))));
             obj.push_back(Pair("status", statusText));
             obj.push_back(Pair("urlImage1", item.sImageOneUrl));
             obj.push_back(Pair("urlImage2", item.sImageTwoUrl));

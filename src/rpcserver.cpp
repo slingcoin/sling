@@ -259,6 +259,7 @@ static const CRPCCommand vRPCCommands[] =
     { "getrichlist",            &getrichlist,            true,      false,      false },
     { "getrichliststats",       &getrichliststats,       true,      false,      false },
 
+
 #ifdef ENABLE_WALLET
     { "getmininginfo",          &getmininginfo,          true,      false,     false },
     { "getstakinginfo",         &getstakinginfo,         true,      false,     false },
@@ -325,6 +326,8 @@ static const CRPCCommand vRPCCommands[] =
     { "smsgsendanon",           &smsgsendanon,           false,     false,     false },
     { "smsginbox",              &smsginbox,              false,     false,     false },
     { "smsgoutbox",             &smsgoutbox,             false,     false,     false },
+
+      /* Market*/
     { "marketalllistings",      &marketalllistings,      false,     false,     false },
     { "marketsearchlistings",   &marketsearchlistings,   false,     false,     false },
     { "marketbuy",              &marketbuy,              false,     false,     false },
@@ -341,6 +344,7 @@ static const CRPCCommand vRPCCommands[] =
     { "marketescrowlock",       &marketescrowlock,       false,     false,     false },
     { "marketreleaseescrow",    &marketreleaseescrow,    false,     false,     false },
     { "marketrequestrefund",    &marketrequestrefund,    false,     false,     false },
+
 #endif
 };
 
