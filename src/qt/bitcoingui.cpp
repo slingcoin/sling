@@ -75,9 +75,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QtScript/QScriptEngine>
-#include <QtScript/QScriptValue>
-#include <QtScript/QScriptValueIterator>
+
 #include <QTimer>
 
 #include <iostream>
@@ -312,6 +310,7 @@ void BitcoinGUI::updateTimer_timeout()
 
 void BitcoinGUI::bittrexReplyFinished()
 { 
+    /*
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (reply->error() !=0)
     {
@@ -349,7 +348,9 @@ void BitcoinGUI::bittrexReplyFinished()
 	    labelPrice->setText("Bittrex: " + QString::number(last, 'f', 8) + " BTC/SLING");
         }
 	uiInterface.NotifyLastPriceUpdated();
+
     }
+*/
 }
 
 void BitcoinGUI::createActions()
