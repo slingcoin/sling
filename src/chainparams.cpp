@@ -83,11 +83,15 @@ public:
         hashGenesisBlock = genesis.GetHash();    
         assert(hashGenesisBlock == uint256("0x000068da359332ba073abd8ec4359d015cb81362a472c3d8041da2a15e842c5a"));
         assert(genesis.hashMerkleRoot == uint256("0x362bb355211c1a2e5187dabf999badae1dbdda97853bbdabada7a07ff9ac92b1"));
-
         
+        vSeeds.push_back(CDNSSeedData("slingcoin.io", "slingseed1.slingcoin.io"));
+        vSeeds.push_back(CDNSSeedData("slingcoin.tech", "slingseed2.slingcoin.tech"));
+        vSeeds.push_back(CDNSSeedData("sling.ws", "slingseed3.sling.ws"));
+        vSeeds.push_back(CDNSSeedData("slingmarket.io", "slingseed4.slingmarket.io"));
+        vSeeds.push_back(CDNSSeedData("slingmarket.tech", "slingseed5.slingmarket.tech"));
+        vSeeds.push_back(CDNSSeedData("slingcoin.info", "slingseed6.slingcoin.info"));
+        vSeeds.push_back(CDNSSeedData("slingcoin.info", "slingseed7.slingcoin.info"));
 
-       
-        
         base58Prefixes[PUBKEY_ADDRESS] = list_of(63);
         base58Prefixes[SCRIPT_ADDRESS] = list_of(85);
         base58Prefixes[SECRET_KEY] =     list_of(153);
